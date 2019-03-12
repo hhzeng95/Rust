@@ -1,0 +1,174 @@
+use std::{ops, fmt};
+
+#[derive(PartialEq, Debug)]
+pub struct Matrix<T> {
+	
+	data: Vec<T>,
+	
+	row: usize,
+	col: usize,
+}
+
+impl<T: Copy> Matrix<T> {
+	/// Creates a new matrix of `row` rows and `col` columns, and initializes
+	/// the matrix with the elements in `values` in row-major order.
+	pub fn new(row: usize, col: usize, values: &[T]) -> Matrix<T> 
+	{Matrix{
+		data: values.to_owned(),
+		row: row,
+		col: col,
+			}}
+
+	/// Creates a new, empty matrix of `row` rows and `col` columns.
+	/// `data` contains no element.
+	pub fn new_empty(row: usize, col: usize) -> Matrix<T> {
+		Matrix{
+		data: vec![],
+		row: row,
+		col: col,
+		
+		}
+	}
+
+	/// Returns a shared reference to `data`
+	pub fn data(&self) -> &Vec<T> {
+		 return &self.data;
+	}
+
+	/// Returns a mutable reference to `data`
+	pub fn mut_data(&mut self) -> &mut Vec<T> {
+		return & mut self.data;
+	}
+
+	/// Returns the number of rows and columns in the first and second
+	/// elements of the tuple, respectively.
+	pub fn size(&self) -> (usize, usize) {
+		return (self.row, self.col);
+		
+	}
+}
+
+impl<T: ops::Add<Output = T> + Copy> ops::Add for Matrix<T> {
+	type Output = Self;
+
+	/// Returns the sum of `self` and `rhs`. If `self.row != rhs.row || self.col != rhs.col`, panic.
+	fn add(self, rhs: Self) -> Self::Output {
+		    
+	assert!(self.col == rhs.col);
+	assert!(self.row == rhs.row);
+			let mut add = Vec::new(); 
+				
+				let length=self.data.len();
+				
+			     for i in 0..length {
+					add.push(self.data[i]+rhs.data[i])
+												}
+
+							Matrix {
+								data: add, 
+								row: self.row,
+								col: self.col,
+							}
+						}
+					}
+
+				
+
+impl<T: ops::Sub<Output = T> + Copy> ops::Sub for Matrix<T> {
+	type Output = Self;
+
+	/// Returns the subtraction of `rhs` from `self`. If `self.row != rhs.row || self.col != rhs.col`, panic.
+	fn sub(self, rhs: Self) -> Self::Output {
+		assert!(self.col == rhs.col);
+		assert!(self.row == rhs.row);
+              let mut sub = Vec::new(); 
+				 let length=self.data.len();
+				 				                
+				
+				 for i in 0..length {
+					sub.push(self.data[i]-rhs.data[i])
+				}
+
+				Matrix {
+					data: sub, // finally, return addition result using new_data
+					row: self.row,
+					col: self.col,
+				}
+			}
+		}
+	
+
+
+impl<T: ops::Add<Output = T> + ops::Mul<Output = T> + Copy> ops::Mul for Matrix<T> {
+	type Output = Self;
+
+	/// Returns the multiplication of `self` by `rhs`. If `self.col != rhs.row`, panic.
+	fn mul(self, rhs: Self) -> Self::Output {
+	
+			assert!(self.col == rhs.row);
+		    let mut mul = Vec::new();
+				let mut add =Vec::new();	
+ 		                let nrow = rhs.row;
+		                let ncol = rhs.col;
+						 let n_row=self.row;
+						 let n_col=self.col;
+					
+						for k in 0..n_row{
+							for i in 0..ncol{
+								for j in 0..n_col{
+								
+						        let index_2=j*ncol+i;
+								let index_1=k*n_col+j;
+								
+					add.push(self.data[index_1]*rhs.data[index_2]);
+				    
+							
+	              
+	                 	}  let sum = add.iter().fold(add[0], |a, &b| a + b);   
+	                            mul.push(sum)      }}
+						Matrix {
+							data: mul,
+							row: self.row,
+							col: rhs.col,}}}
+
+
+
+impl<T: fmt::Display> fmt::Display for Matrix<T> {
+	/// Formats the matrix as follows:
+	/// * Writes each row on a separate line. No empty lines before or after any row.
+	/// * On each row, writes each element followed by a single space, except no space following the last element of the row.
+	/// Outputs using `write!(f, ...)`.
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		let nrow = self.row;
+		let ncol = self.col;
+		let a=ncol-1;	
+			
+			for i in 0..nrow{
+				for j in 0..ncol{
+					let index = i * ncol + j; 
+					let transfer_to_string = self.data[index].to_string();
+					
+					if j != a {
+						
+						write!(f, "{} ", transfer_to_string);
+						}
+					
+				     else {
+					
+					write!(f, "{}\n", transfer_to_string);
+					}
+				}}
+			write!(f,"")
+			
+			
+			
+				  
+			}
+		}
+		fn main() {
+			let x = Matrix::new(3, 4, &[1,2,1,1,2,2,2,2,2,2,2,2]);
+			let y = Matrix::new(4, 3, &[1,2,1,1,2,2,2,2,1,1,1,1]);
+			let x=x*y;
+			
+	         println!("{}", x);
+		}
